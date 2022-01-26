@@ -75,10 +75,4 @@ public class TodoRepository : ITodoRepository
     {
         return _context.TodoItems.Any(x => x.Id == id);
     }
-
-    private bool TodoItemDescriptionExists(string description)
-    {
-        return _context.TodoItems
-            .Any(x => x.Description.ToLowerInvariant() == description.ToLowerInvariant() && !x.IsCompleted);
-    }
 }
