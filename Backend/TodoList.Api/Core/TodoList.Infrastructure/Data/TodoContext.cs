@@ -3,12 +3,7 @@ using TodoList.Infrastructure.Data.Models;
 
 namespace TodoList.Infrastructure.Data
 {
-    public interface ITodoContext
-    {
-        DbSet<TodoItem> TodoItems { get; }
-    }
-    
-    public class TodoContext : DbContext, ITodoContext
+    public class TodoContext : DbContext
     {
         public TodoContext(DbContextOptions<TodoContext> options)
             : base(options)
