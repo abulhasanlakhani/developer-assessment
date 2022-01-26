@@ -10,7 +10,7 @@ import Footer from './components/Footer/Footer'
 const App = () => {
   const [description, setDescription] = useState('')
   const [items, setItems] = useState([])
-
+  const API_URL = 'https://localhost:5001/api/todoitems'
   useEffect(() => {
     const todoItems = async () => {
       // try {
@@ -19,12 +19,15 @@ const App = () => {
       //   console.error('My Error: ', error)
       // }
 
-      await axios.get('https://localhost:5001/api/todoitems')
-        .then(res => setItems(res.data))
+      await axios
+        .get(API_URL)
+        .then((res) => {
+          setItems(res.data)
+          console.log(res.data)
+        })
         .catch((err) => {
           console.error('My Error: ', err)
         })
-
       //setItems(data)
     }
 
@@ -45,19 +48,21 @@ const App = () => {
 
   async function handleAdd(enteredDescription) {
     try {
-      const response = await axios.post('https://localhost:5001/api/todoitems', {
-        description: enteredDescription,
-      }).catch(err => {
-        throw err
-      })
+      const response = await axios
+        .post(API_URL, {
+          description: enteredDescription,
+        })
+        .catch((err) => {
+          throw err
+        })
 
-      const updatedTodos = [...items]
+      let updatedTodos = [...items]
 
       updatedTodos.push(response.data)
 
       setItems(updatedTodos)
     } catch (error) {
-        console.error('Error has occured: ', error)
+      console.error('Error has occured: ', error)
     }
   }
 
@@ -67,7 +72,22 @@ const App = () => {
 
   async function handleMarkAsComplete(item) {
     try {
-      alert('todo')
+      await axios
+        .put(`${API_URL}/${item.id}`, {
+          id: item.id,
+          description: item.description,
+          isCompleted: true,
+        })
+        .then(() => {
+          let mapped = items.map(i => {
+            return i.id === item.id ? { ...i, isCompleted: !i.isCompleted } : { ...i};
+          });
+                    
+          setItems(mapped)
+        })
+        .catch((err) => {
+          console.error(err)
+        })
     } catch (error) {
       console.error(error)
     }
