@@ -1,11 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31613.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32113.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoList.Api", "TodoList.Api\TodoList.Api.csproj", "{065CE954-2618-4A24-A613-9C336C2154C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Api.UnitTests", "TodoList.Api.UnitTests\TodoList.Api.UnitTests.csproj", "{2BBBFEED-85B6-4361-85B2-F9E08C86C55B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoList.Api.UnitTests", "TodoList.Api.UnitTests\TodoList.Api.UnitTests.csproj", "{2BBBFEED-85B6-4361-85B2-F9E08C86C55B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Infrastructure", "Core\TodoList.Infrastructure\TodoList.Infrastructure.csproj", "{B4A3EEE7-2E32-4187-9293-CB189C37C46B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{4A307FFD-A2D1-49BA-B16F-8C45D2A77BFD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{9C578494-CA68-4954-8E21-16F618A895A2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{35EE51BC-DD5A-4778-BC62-2DE289942ECF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +29,18 @@ Global
 		{2BBBFEED-85B6-4361-85B2-F9E08C86C55B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BBBFEED-85B6-4361-85B2-F9E08C86C55B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BBBFEED-85B6-4361-85B2-F9E08C86C55B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4A3EEE7-2E32-4187-9293-CB189C37C46B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4A3EEE7-2E32-4187-9293-CB189C37C46B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4A3EEE7-2E32-4187-9293-CB189C37C46B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4A3EEE7-2E32-4187-9293-CB189C37C46B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{065CE954-2618-4A24-A613-9C336C2154C6} = {9C578494-CA68-4954-8E21-16F618A895A2}
+		{2BBBFEED-85B6-4361-85B2-F9E08C86C55B} = {35EE51BC-DD5A-4778-BC62-2DE289942ECF}
+		{B4A3EEE7-2E32-4187-9293-CB189C37C46B} = {4A307FFD-A2D1-49BA-B16F-8C45D2A77BFD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {061F7879-5D14-4C5E-A4A9-782C6FEB1132}
