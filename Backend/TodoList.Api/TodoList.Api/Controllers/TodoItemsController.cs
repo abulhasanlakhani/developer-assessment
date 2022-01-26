@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using TodoList.Infrastructure.Data;
 using TodoList.Infrastructure.Data.Models;
 using TodoList.Infrastructure.Repositories.Interfaces;
 
@@ -17,14 +14,10 @@ namespace TodoList.Api.Controllers
     public class TodoItemsController : ControllerBase
     {
         private readonly ITodoRepository _todoRepository;
-        private readonly TodoContext _context;
-        private readonly ILogger<TodoItemsController> _logger;
 
-        public TodoItemsController(ITodoRepository todoRepository, TodoContext context, ILogger<TodoItemsController> logger)
+        public TodoItemsController(ITodoRepository todoRepository)
         {
             _todoRepository = todoRepository;
-            _context = context;
-            _logger = logger;
         }
 
         [HttpGet]
@@ -77,7 +70,7 @@ namespace TodoList.Api.Controllers
                 return BadRequest("Description is required");
             }
 
-            if (TodoItemDescriptionExists(todoItem.Description))
+            if (_todoRepository.TodoItemDescriptionExists(todoItem.Description))
             {
                 return BadRequest("Description already exists");
             }
@@ -85,12 +78,6 @@ namespace TodoList.Api.Controllers
             await _todoRepository.AddTodo(todoItem);
              
             return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItem);
-        } 
-        
-        private bool TodoItemDescriptionExists(string description)
-        {
-            return _context.TodoItems
-                   .Any(x => x.Description.ToLowerInvariant() == description.ToLowerInvariant() && !x.IsCompleted);
         }
     }
 }

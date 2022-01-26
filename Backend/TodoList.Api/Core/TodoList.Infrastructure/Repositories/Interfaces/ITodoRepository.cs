@@ -8,4 +8,5 @@ public interface ITodoRepository
     public Task<TodoItem?> GetTodoById(Guid id);
     public Task<bool> EditTodo(Guid id, TodoItem todoItemToEdit);
     public Task AddTodo(TodoItem newTodoItem);
+    bool TodoItemDescriptionExists(string description);
 }

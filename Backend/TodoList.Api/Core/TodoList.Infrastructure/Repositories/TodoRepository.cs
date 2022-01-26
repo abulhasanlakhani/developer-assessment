@@ -20,7 +20,8 @@ public class TodoRepository : ITodoRepository
     public async Task<List<TodoItem>> GetTodos()
     {
         var todos = await _context.TodoItems.Where(x => !x.IsCompleted).ToListAsync();
-        _logger.LogInformation($"{todos.Count} todos retrieved from the database");
+
+        _logger?.LogInformation($"{todos.Count} todos retrieved from the database");
 
         return todos;
     }
@@ -31,11 +32,11 @@ public class TodoRepository : ITodoRepository
 
         if (todo == null)
         {
-            _logger.LogError($"todo with ID: {id} could not be found in the database");
+            _logger?.LogError($"todo with ID: {id} could not be found in the database");
             return null;
         }
 
-        _logger.LogInformation($"{todo.Id} todos retrieved from the database");
+        _logger?.LogInformation($"{todo.Id} todos retrieved from the database");
 
         return todo;
     }
@@ -52,27 +53,40 @@ public class TodoRepository : ITodoRepository
         {
             if (!TodoItemIdExists(id))
             {
-                _logger.LogError($"todo with ID: {id} could not be found in the database");
+                _logger?.LogError($"todo with ID: {id} could not be found in the database");
                 return false;
             }
 
             throw;
         }
 
-        _logger.LogInformation($"Todo with ID {todoItemToEdit.Id} has been updated in the database!");
+        _logger?.LogInformation($"Todo with ID {todoItemToEdit.Id} has been updated in the database!");
         return true;
     }
 
     public async Task AddTodo(TodoItem newTodoItem)
     {
+        if (string.IsNullOrEmpty(newTodoItem.Description))
+        {
+            throw new ArgumentNullException(nameof(TodoItem));
+        }
+
         _context.TodoItems.Add(newTodoItem);
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation($"Todo with ID {newTodoItem.Id} has been added to the database!");
+        _logger?.LogInformation($"Todo with ID {newTodoItem.Id} has been added to the database!");
+    }
+
+    public bool TodoItemDescriptionExists(string description)
+    {
+        return _context.TodoItems
+            .Any(x => x.Description.ToLowerInvariant() == description.ToLowerInvariant() && !x.IsCompleted);
     }
 
     private bool TodoItemIdExists(Guid id)
     {
         return _context.TodoItems.Any(x => x.Id == id);
     }
+
+    
 }

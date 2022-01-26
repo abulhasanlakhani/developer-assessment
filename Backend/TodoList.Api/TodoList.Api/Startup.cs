@@ -41,7 +41,6 @@ namespace TodoList.Api
             });
 
             services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("TodoItemsDB"));
-
             services.AddScoped<ITodoRepository, TodoRepository>();
         }
 
