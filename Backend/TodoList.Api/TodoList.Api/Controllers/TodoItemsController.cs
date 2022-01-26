@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using TodoList.Infrastructure.Data;
+using TodoList.Infrastructure.Data.Models;
 
 namespace TodoList.Api.Controllers
 {

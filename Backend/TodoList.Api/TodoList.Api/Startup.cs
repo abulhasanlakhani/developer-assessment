@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using TodoList.Infrastructure.Data;
 
 namespace TodoList.Api
 {
@@ -41,7 +42,7 @@ namespace TodoList.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TodoContext context)
         {
             if (env.IsDevelopment())
             {
@@ -49,6 +50,8 @@ namespace TodoList.Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoList.Api v1"));
             }
+
+            context.Database.EnsureCreated();
 
             app.UseHttpsRedirection();
 
