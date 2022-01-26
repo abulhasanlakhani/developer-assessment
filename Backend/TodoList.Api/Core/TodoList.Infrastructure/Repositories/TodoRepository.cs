@@ -71,6 +71,9 @@ public class TodoRepository : ITodoRepository
             throw new ArgumentNullException(nameof(TodoItem));
         }
 
+        newTodoItem.Id = Guid.NewGuid();
+        newTodoItem.IsCompleted = false;
+
         _context.TodoItems.Add(newTodoItem);
         await _context.SaveChangesAsync();
 
