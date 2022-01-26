@@ -19,7 +19,7 @@ public class TodoRepository : ITodoRepository
 
     public async Task<List<TodoItem>> GetTodos()
     {
-        var todos = await _context.TodoItems.Where(x => !x.IsCompleted).ToListAsync();
+        var todos = await _context.TodoItems.ToListAsync();
 
         _logger?.LogInformation($"{todos.Count} todos retrieved from the database");
 
@@ -70,6 +70,9 @@ public class TodoRepository : ITodoRepository
         {
             throw new ArgumentNullException(nameof(TodoItem));
         }
+
+        newTodoItem.Id = Guid.NewGuid();
+        newTodoItem.IsCompleted = false;
 
         _context.TodoItems.Add(newTodoItem);
         await _context.SaveChangesAsync();
