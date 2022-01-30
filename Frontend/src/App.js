@@ -1,42 +1,36 @@
 import './App.css'
-import { Image, Container, Row, Col } from 'react-bootstrap'
+import { Container, Row, Col, Image } from 'react-bootstrap'
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import TodoList from './components/TodoList/TodoList'
 import NewTodo from './components/NewTodo/NewTodo'
-import Description from './components/Description/Description'
 import Footer from './components/Footer/Footer'
+import Description from './components/Description/Description'
 
 const App = () => {
-  const [description, setDescription] = useState('')
-  const [items, setItems] = useState([])
+  const [todoItems, setTodoItems] = useState([])
+  const [, setSuccess] = useState(false)
+
   const API_URL = 'https://localhost:5001/api/todoitems'
   useEffect(() => {
-    const todoItems = async () => {
-      // try {
-
-      // } catch (error) {
-      //   console.error('My Error: ', error)
-      // }
-
+    const loadTodosFromServer = async () => {
+      console.log('Loading Todos from the server...')
       await axios
         .get(API_URL)
         .then((res) => {
-          setItems(res.data)
-          console.log(res.data)
+          setTodoItems(res.data)
         })
         .catch((err) => {
           console.error('My Error: ', err)
         })
-      //setItems(data)
     }
+    loadTodosFromServer()
 
-    todoItems()
+    // Cleanup function - Set the success flag back to default position before this useEffect hook runs next time
+    return function cleanup() {
+      console.log('Running cleanup now...')
+    }
   }, [])
-
-  const handleDescriptionChange = (event) => {
-    setDescription(event.target.value)
-  }
 
   async function getItems() {
     try {
@@ -44,30 +38,6 @@ const App = () => {
     } catch (error) {
       console.error(error)
     }
-  }
-
-  async function handleAdd(enteredDescription) {
-    try {
-      const response = await axios
-        .post(API_URL, {
-          description: enteredDescription,
-        })
-        .catch((err) => {
-          throw err
-        })
-
-      let updatedTodos = [...items]
-
-      updatedTodos.push(response.data)
-
-      setItems(updatedTodos)
-    } catch (error) {
-      console.error('Error has occured: ', error)
-    }
-  }
-
-  function handleClear() {
-    setDescription('')
   }
 
   async function handleMarkAsComplete(item) {
@@ -79,11 +49,11 @@ const App = () => {
           isCompleted: true,
         })
         .then(() => {
-          let mapped = items.map(i => {
-            return i.id === item.id ? { ...i, isCompleted: !i.isCompleted } : { ...i};
-          });
-                    
-          setItems(mapped)
+          let mapped = todoItems.map((i) => {
+            return i.id === item.id ? { ...i, isCompleted: !i.isCompleted } : { ...i }
+          })
+
+          setTodoItems(mapped)
         })
         .catch((err) => {
           console.error(err)
@@ -95,31 +65,26 @@ const App = () => {
 
   return (
     <div className="App">
-      <Container>
+      <Container style={{backgroundColor: 'var(--bs-green)', padding: '10px'}}>
         <Row>
-          <Col>
-            <Image src="clearPointLogo.png" fluid rounded />
+          <Col xs={4} style={{ placeSelf: 'center' }}>
+            <Image width={887} height={212} src="clearPointLogo.png" fluid rounded />
           </Col>
-        </Row>
-        <Row>
           <Col>
             <Description />
           </Col>
         </Row>
+      </Container>
+      <Container>
         <Row>
           <Col>
-            <NewTodo
-              description={description}
-              handleAdd={handleAdd}
-              handleClear={handleClear}
-              handleDescriptionChange={handleDescriptionChange}
-            />
+            <NewTodo todoItems={todoItems} setTodoItems={setTodoItems} successStatusHandler={setSuccess} />
           </Col>
         </Row>
         <br />
         <Row>
           <Col>
-            <TodoList items={items} getItems={getItems} handleMarkAsComplete={handleMarkAsComplete} />
+            <TodoList items={todoItems} getItems={getItems} handleMarkAsComplete={handleMarkAsComplete} />
           </Col>
         </Row>
       </Container>
