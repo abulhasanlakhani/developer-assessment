@@ -13,6 +13,7 @@ const App = () => {
   const [todoItems, setTodoItems] = useState([])
 
   useEffect(() => {
+    // useEffect doesn't support async naturally so we have to first define async function and call it
     const loadTodosFromServer = async () => {
       await axios
         .get(API_URL)
@@ -24,7 +25,7 @@ const App = () => {
         })
     }
     loadTodosFromServer()
-  }, [])
+  }, []) // empty array here means this hook runs on the initial page load only
 
   async function getItems() {
     try {

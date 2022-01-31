@@ -10,8 +10,6 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
 
   const [description, setDescription] = useState('')
   const [validDescription, setValidDescription] = useState(false)
-  const [, setDescriptionFocus] = useState(false)
-  const [, setValidated] = useState(false)
 
   const [errMsg, setErrMsg] = useState('')
 
@@ -33,13 +31,15 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
     return true
   }
 
+  // focus on description textbox when page is loaded
   useEffect(() => {
     descriptionRef.current.focus()
-  }, [])
+  }, []) // empty array here means it only runs on the initial page load
 
+  // Clear any error as soon as user starts typing again
   useEffect(() => {
     setErrMsg('')
-  }, [description])
+  }, [description]) // passing description here means this hook will only run if description state is changed
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -61,7 +61,6 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
       //clear state and controlled inputs
       //need value attrib on inputs for this
       setDescription('')
-      setValidated(true)
     } catch (err) {
       if (!err?.response) {
         setErrMsg('No Server Response')
@@ -97,8 +96,6 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
             ref={descriptionRef}
             required
             aria-invalid={validDescription ? 'false' : 'true'}
-            onFocus={() => setDescriptionFocus(true)}
-            onBlur={() => setDescriptionFocus(false)}
           />
         </Col>
       </Form.Group>

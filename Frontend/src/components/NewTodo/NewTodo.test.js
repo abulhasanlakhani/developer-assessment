@@ -17,5 +17,5 @@ test('Add item button is clicked without entering description', async () => {
     expect(await screen.findByRole('button', { name: /Add Item/i})).toBeEnabled()
     fireEvent.click(addTodoButton)
 
-    expect(await screen.getByText('Description is required')).toBeVisible()   
+    expect(await screen.findByText('Description is required')).toBeVisible()   
 })

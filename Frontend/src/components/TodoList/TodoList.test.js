@@ -1,4 +1,4 @@
-import { findByText, render, screen } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import TodoList from "./TodoList"
 
 const todos = [
