@@ -1,4 +1,4 @@
-import { render, screen, queryByAttribute, fireEvent } from "@testing-library/react"
+import { render, screen, fireEvent } from "@testing-library/react"
 import App from "../../App"
 import NewTodo from "./NewTodo"
 
@@ -10,12 +10,12 @@ test('Validation errors are not visible by default', async () => {
     expect(screen.queryByText('Description is required')).toBeNull()   
 })
 
-test('Description required error message is visible if ', async () => {
+test('Add item button is clicked without entering description', async () => {
     const todoComp = render(<NewTodo />)
     const addTodoButton = todoComp.container.querySelector("button[name='btnAddTodoItem']")
         
     expect(await screen.findByRole('button', { name: /Add Item/i})).toBeEnabled()
     fireEvent.click(addTodoButton)
 
-    screen.getByText('Description is required')   
+    expect(await screen.getByText('Description is required')).toBeVisible()   
 })

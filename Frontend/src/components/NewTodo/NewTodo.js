@@ -53,8 +53,6 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
       })
 
       if (response?.status === 201) {
-        console.log(response)
-
         let updatedTodos = [...todoItems]
         updatedTodos.push(response.data)
         setTodoItems(updatedTodos)

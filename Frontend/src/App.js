@@ -7,13 +7,13 @@ import NewTodo from './components/NewTodo/NewTodo'
 import Footer from './components/Footer/Footer'
 import Description from './components/Description/Description'
 
+export const API_URL = 'https://localhost:5001/api/todoitems'
+
 const App = () => {
   const [todoItems, setTodoItems] = useState([])
 
-  const API_URL = 'https://localhost:5001/api/todoitems'
   useEffect(() => {
     const loadTodosFromServer = async () => {
-      console.log('Loading Todos from the server...')
       await axios
         .get(API_URL)
         .then((res) => {
@@ -24,11 +24,6 @@ const App = () => {
         })
     }
     loadTodosFromServer()
-
-    // Cleanup function - Set the success flag back to default position before this useEffect hook runs next time
-    return function cleanup() {
-      console.log('Running cleanup now...')
-    }
   }, [])
 
   async function getItems() {
