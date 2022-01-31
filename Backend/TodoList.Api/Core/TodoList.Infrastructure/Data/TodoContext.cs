@@ -12,10 +12,11 @@ namespace TodoList.Infrastructure.Data
 
         public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
+        // Use Seed.TodoList or Seed.BlankTodoList or comment out OnModelCreating method
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TodoItem>().HasData(Seed.Todos);
-            
+            modelBuilder.Entity<TodoItem>().HasData(Seed.TodoList);
+
             base.OnModelCreating(modelBuilder);
         }
     }

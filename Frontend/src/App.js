@@ -27,15 +27,7 @@ const App = () => {
     loadTodosFromServer()
   }, []) // empty array here means this hook runs on the initial page load only
 
-  async function getItems() {
-    try {
-      alert('todo')
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  async function handleMarkAsComplete(item) {
+  const handleMarkAsComplete = async (item) => {
     try {
       await axios
         .put(`${API_URL}/${item.id}`, {
@@ -63,7 +55,7 @@ const App = () => {
       <Container style={{backgroundColor: 'var(--bs-green)', padding: '10px'}}>
         <Row>
           <Col xs={4} style={{ placeSelf: 'center' }}>
-            <Image width={887} height={212} src="clearPointLogo.png" fluid rounded />
+            <Image width="887px" height="212px" src="clearPointLogo.png" alt='Clearpoint logo' fluid rounded />
           </Col>
           <Col>
             <Description />
@@ -79,7 +71,7 @@ const App = () => {
         <br />
         <Row>
           <Col>
-            <TodoList items={todoItems} getItems={getItems} handleMarkAsComplete={handleMarkAsComplete} />
+            <TodoList items={todoItems} handleMarkAsComplete={handleMarkAsComplete} />
           </Col>
         </Row>
       </Container>
