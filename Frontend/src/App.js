@@ -9,7 +9,6 @@ import Description from './components/Description/Description'
 
 const App = () => {
   const [todoItems, setTodoItems] = useState([])
-  const [, setSuccess] = useState(false)
 
   const API_URL = 'https://localhost:5001/api/todoitems'
   useEffect(() => {
@@ -78,7 +77,7 @@ const App = () => {
       <Container>
         <Row>
           <Col>
-            <NewTodo todoItems={todoItems} setTodoItems={setTodoItems} successStatusHandler={setSuccess} />
+            <NewTodo todoItems={todoItems} setTodoItems={setTodoItems} />
           </Col>
         </Row>
         <br />
