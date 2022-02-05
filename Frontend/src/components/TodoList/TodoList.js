@@ -2,22 +2,22 @@ import React from 'react';
 import { Button, Table } from 'react-bootstrap'
 import TodoItem from '../TodoItem/TodoItem';
 
-const TodoList = ({items, getItems, handleMarkAsComplete}) => {
+const TodoList = ({items, handleMarkAsComplete}) => {
     return (
-        <>
-          <h1>
+        items.length ? <>
+          <h1 role="heading">
             Showing {items.length} Item(s){' '}
-            <Button variant="primary" className="pull-right" onClick={() => getItems()}>
+            <Button variant="primary" className="pull-right">
               Refresh
             </Button>
           </h1>
   
-          <Table striped bordered hover>
+          <Table role="table" aria-label='todoList-table' striped bordered hover>
             <thead>
-              <tr>
-                <th>Id</th>
-                <th>Description</th>
-                <th>Action</th>
+              <tr role="row">
+                <th role="columnheader">Id</th>
+                <th role="columnheader">Description</th>
+                <th role="columnheader">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -26,7 +26,7 @@ const TodoList = ({items, getItems, handleMarkAsComplete}) => {
               ))}
             </tbody>
           </Table>
-        </>
+        </> : null
       )
 };
 

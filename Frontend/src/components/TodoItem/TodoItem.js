@@ -3,10 +3,10 @@ import { Button } from 'react-bootstrap'
 
 const TodoItem = ({item, handleMarkAsComplete}) => {
     return (
-    <tr style={{ textDecoration: item.isCompleted ? "line-through" : "" }}>
-      <td>{item.id}</td>
-      <td>{item.description}</td>
-      <td>
+    <tr role="row" style={{ textDecoration: item.isCompleted ? "line-through" : "" }}>
+      <td role="cell">{item.id}</td>
+      <td role="cell">{item.description}</td>
+      <td role="cell">
         <Button variant="warning" size="sm" onClick={() => handleMarkAsComplete(item)}>
           {item.isCompleted && "Mark as in progress"} 
           {!item.isCompleted && "Mark as completed"} 

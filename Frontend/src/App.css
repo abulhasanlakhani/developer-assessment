@@ -1,9 +1,9 @@
-.App {
-  text-align: center;
-}
-
 .list-left {
   text-align: left;
+}
+
+.App {
+  margin-top: 10px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
