@@ -1,12 +1,18 @@
 import './NewTodo.css'
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, MouseEvent } from 'react'
 import { Button, Container, Row, Col, Form, Stack } from 'react-bootstrap'
 import axios from 'axios'
+import { TodoItemType } from '../TodoItem/TodoItem'
 
-const NewTodo = ({ todoItems, setTodoItems }) => {
+export type NewTodoProps = {
+  todoItems: TodoItemType[]
+  setTodoItems: React.Dispatch<React.SetStateAction<TodoItemType[]>>
+}
+
+const NewTodo = (newTodoProps: NewTodoProps) => {
   const API_URL = 'https://localhost:5001/api/todoitems'
-  const descriptionRef = useRef<HTMLInputElement>()
-  const errRef = useRef<HTMLParagraphElement>()
+  const descriptionRef = useRef<HTMLInputElement>(null)
+  const errRef = useRef<HTMLParagraphElement>(null)
 
   const [description, setDescription] = useState('')
   const [validDescription, setValidDescription] = useState(false)
@@ -20,7 +26,7 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
       return false
     }
 
-    if (todoItems.find((i) => i.description === description)) {
+    if (newTodoProps.todoItems.find((i) => i.description === description)) {
       setErrMsg('Description already exists')
       setValidDescription(false)
       return false
@@ -32,7 +38,7 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
 
   // focus on description textbox when page is loaded
   useEffect(() => {
-    descriptionRef.current.focus()
+    descriptionRef.current?.focus()
   }, []) // empty array here means it only runs on the initial page load
 
   // Clear any error as soon as user starts typing again
@@ -40,7 +46,7 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
     setErrMsg('')
   }, [description]) // passing description here means this hook will only run if description state is changed
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
 
     if (!validateDescription()) return
@@ -51,23 +57,27 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
       })
 
       if (response?.status === 201) {
-        let updatedTodos = [...todoItems]
+        let updatedTodos = [...newTodoProps.todoItems]
         updatedTodos.push(response.data)
-        setTodoItems(updatedTodos)
+        newTodoProps.setTodoItems(updatedTodos)
       }
 
       //clear state and controlled inputs
       //need value attrib on inputs for this
       setDescription('')
     } catch (err) {
-      if (!err?.response) {
-        setErrMsg('No Server Response')
-      } else if (err.response?.status === 400) {
-        setErrMsg(err?.response.data)
-      } else {
-        setErrMsg('Add failed')
+      // Credit: https://codesandbox.io/s/upbeat-easley-ljgir?file=/src/index.ts:134-180
+      if (axios.isAxiosError(err) && err.response) {
+        if (!err?.response) {
+          setErrMsg('No Server Response')
+        } else if (err.response?.status === 400) {
+          setErrMsg(err?.response.data)
+        } else {
+          setErrMsg('Add failed')
+        }
       }
-      errRef.current.focus()
+
+      errRef.current?.focus()
     }
   }
 

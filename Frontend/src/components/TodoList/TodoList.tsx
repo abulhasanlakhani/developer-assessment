@@ -1,8 +1,12 @@
-import React from 'react'
 import { Button, Table } from 'react-bootstrap'
-import TodoItem from '../TodoItem/TodoItem'
+import TodoItem, { TodoItemType } from '../TodoItem/TodoItem'
 
-const TodoList = ({ items, handleMarkAsComplete }) => {
+export type TodoListType = {
+  items: TodoItemType[]
+  handleMarkAsComplete(item: TodoItemType): void
+}
+
+const TodoList = ({ items, handleMarkAsComplete }: TodoListType) => {
   return items.length ? (
     <>
       <h1>
@@ -21,9 +25,17 @@ const TodoList = ({ items, handleMarkAsComplete }) => {
           </tr>
         </thead>
         <tbody>
-          {items.map((item, index) => (
-            <TodoItem key={index} item={item} handleMarkAsComplete={handleMarkAsComplete} />
-          ))}
+          {items.map((item, index) => {
+            return (
+              <TodoItem
+                key={index}
+                id={item.id}
+                description={item.description}
+                isCompleted={item.isCompleted}
+                handleMarkAsComplete={handleMarkAsComplete}
+              />
+            )
+          })}
         </tbody>
       </Table>
     </>

@@ -1,16 +1,17 @@
 import './App.css'
 import { Container, Row, Col, Image } from 'react-bootstrap'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import TodoList from './components/TodoList/TodoList'
 import NewTodo from './components/NewTodo/NewTodo'
 import Footer from './components/Footer/Footer'
 import Description from './components/Description/Description'
+import { TodoItemType } from './components/TodoItem/TodoItem'
 
 export const API_URL = 'https://localhost:5001/api/todoitems'
 
 const App = () => {
-  const [todoItems, setTodoItems] = useState([])
+  const [todoItems, setTodoItems] = useState<TodoItemType[]>([])
 
   useEffect(() => {
     // useEffect doesn't support async naturally so we have to first define async function and call it
@@ -27,7 +28,7 @@ const App = () => {
     loadTodosFromServer()
   }, []) // empty array here means this hook runs on the initial page load only
 
-  const handleMarkAsComplete = async (item) => {
+  const handleMarkAsComplete = async (item: TodoItemType) => {
     try {
       await axios
         .put(`${API_URL}/${item.id}`, {
@@ -52,10 +53,10 @@ const App = () => {
 
   return (
     <div className="App">
-      <Container style={{backgroundColor: 'var(--bs-green)', padding: '10px'}}>
+      <Container style={{ backgroundColor: 'var(--bs-green)', padding: '10px' }}>
         <Row>
           <Col xs={4} style={{ placeSelf: 'center' }}>
-            <Image width="887px" height="212px" src="clearPointLogo.png" alt='Clearpoint logo' fluid rounded />
+            <Image width="887px" height="212px" src="clearPointLogo.png" alt="Clearpoint logo" fluid rounded />
           </Col>
           <Col>
             <Description />
