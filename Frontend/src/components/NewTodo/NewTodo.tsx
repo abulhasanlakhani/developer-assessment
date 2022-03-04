@@ -1,12 +1,18 @@
 import './NewTodo.css'
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, MouseEvent } from 'react'
 import { Button, Container, Row, Col, Form, Stack } from 'react-bootstrap'
 import axios from 'axios'
+import { TodoItemType } from '../TodoItem/TodoItem'
 
-const NewTodo = ({ todoItems, setTodoItems }) => {
+export type NewTodoProps = {
+  todoItems: TodoItemType[]
+  setTodoItems: React.Dispatch<React.SetStateAction<TodoItemType[]>>
+}
+
+const NewTodo = (newTodoProps: NewTodoProps) => {
   const API_URL = 'https://localhost:5001/api/todoitems'
-  const descriptionRef = useRef()
-  const errRef = useRef()
+  const descriptionRef = useRef<HTMLInputElement>(null)
+  const errRef = useRef<HTMLParagraphElement>(null)
 
   const [description, setDescription] = useState('')
   const [validDescription, setValidDescription] = useState(false)
@@ -14,14 +20,13 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
   const [errMsg, setErrMsg] = useState('')
 
   const validateDescription = () => {
-    
     if (description === '') {
       setErrMsg('Description is required')
       setValidDescription(false)
       return false
     }
 
-    if (todoItems.find((i) => i.description === description)) {
+    if (newTodoProps.todoItems.find((i) => i.description === description)) {
       setErrMsg('Description already exists')
       setValidDescription(false)
       return false
@@ -33,7 +38,7 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
 
   // focus on description textbox when page is loaded
   useEffect(() => {
-    descriptionRef.current.focus()
+    descriptionRef.current?.focus()
   }, []) // empty array here means it only runs on the initial page load
 
   // Clear any error as soon as user starts typing again
@@ -41,11 +46,10 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
     setErrMsg('')
   }, [description]) // passing description here means this hook will only run if description state is changed
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
 
-    if (!validateDescription())
-      return
+    if (!validateDescription()) return
 
     try {
       const response = await axios.post(API_URL, {
@@ -53,23 +57,27 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
       })
 
       if (response?.status === 201) {
-        let updatedTodos = [...todoItems]
+        let updatedTodos = [...newTodoProps.todoItems]
         updatedTodos.push(response.data)
-        setTodoItems(updatedTodos)
+        newTodoProps.setTodoItems(updatedTodos)
       }
 
       //clear state and controlled inputs
       //need value attrib on inputs for this
       setDescription('')
     } catch (err) {
-      if (!err?.response) {
-        setErrMsg('No Server Response')
-      } else if (err.response?.status === 400) {
-        setErrMsg(err?.response.data)
-      } else {
-        setErrMsg('Add failed')
+      // Credit: https://codesandbox.io/s/upbeat-easley-ljgir?file=/src/index.ts:134-180
+      if (axios.isAxiosError(err) && err.response) {
+        if (!err?.response) {
+          setErrMsg('No Server Response')
+        } else if (err.response?.status === 400) {
+          setErrMsg(err?.response.data)
+        } else {
+          setErrMsg('Add failed')
+        }
       }
-      errRef.current.focus()
+
+      errRef.current?.focus()
     }
   }
 
@@ -79,7 +87,7 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
 
   return (
     <Container>
-      <h1>Add Item</h1>
+      <h1>Add New Todo</h1>
       <p ref={errRef} className={errMsg ? 'errmsg' : 'offscreen'} aria-live="assertive">
         {errMsg}
       </p>
@@ -101,7 +109,7 @@ const NewTodo = ({ todoItems, setTodoItems }) => {
       </Form.Group>
       <Form.Group as={Row} className="mb-3 offset-md-2" controlId="formAddTodoItem">
         <Stack direction="horizontal" gap={2}>
-          <Button variant="primary" onClick={handleSubmit} name='btnAddTodoItem'>
+          <Button variant="primary" onClick={handleSubmit} name="btnAddTodoItem">
             Add Item
           </Button>
           <Button variant="secondary" onClick={handleClear}>

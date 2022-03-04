@@ -1,9 +1,8 @@
-import React from 'react'
 import { Alert } from 'react-bootstrap'
 
 const Description = () => {
   return (
-    <Alert variant="success" style={{marginBottom: 0}}>
+    <Alert variant="success" style={{ marginBottom: 0 }}>
       <Alert.Heading>Todo List App</Alert.Heading>
       Welcome to the ClearPoint frontend technical test. We like to keep things simple, yet clean so your task(s) are as
       follows:
