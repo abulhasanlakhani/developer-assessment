@@ -87,7 +87,7 @@ const NewTodo = (newTodoProps: NewTodoProps) => {
 
   return (
     <Container>
-      <h1>Add Item</h1>
+      <h1>Add New Todo</h1>
       <p ref={errRef} className={errMsg ? 'errmsg' : 'offscreen'} aria-live="assertive">
         {errMsg}
       </p>

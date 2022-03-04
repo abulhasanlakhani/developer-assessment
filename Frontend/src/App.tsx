@@ -10,12 +10,14 @@ import { TodoItemType } from './components/TodoItem/TodoItem'
 
 export const API_URL = 'https://localhost:5001/api/todoitems'
 
-const App = () => {
+const App = ({ isTest = false }) => {
   const [todoItems, setTodoItems] = useState<TodoItemType[]>([])
 
   useEffect(() => {
     // useEffect doesn't support async naturally so we have to first define async function and call it
     const loadTodosFromServer = async () => {
+      if (isTest) return
+
       await axios
         .get(API_URL)
         .then((res) => {
@@ -26,7 +28,7 @@ const App = () => {
         })
     }
     loadTodosFromServer()
-  }, []) // empty array here means this hook runs on the initial page load only
+  }, [isTest]) // empty array here means this hook runs on the initial page load only
 
   const handleMarkAsComplete = async (item: TodoItemType) => {
     try {
