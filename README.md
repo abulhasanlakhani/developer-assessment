@@ -1,3 +1,5 @@
+[![Node.js CI](https://github.com/abulhasanlakhani/developer-assessment/actions/workflows/node.js.yml/badge.svg)](https://github.com/abulhasanlakhani/developer-assessment/actions/workflows/node.js.yml)
+
 # Developer Assessment
 
 This repository contains code used in the interview process for developers joining the Microsoft Engineering Practice at ClearPoint.
