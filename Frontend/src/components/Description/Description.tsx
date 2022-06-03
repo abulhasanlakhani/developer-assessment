@@ -1,23 +1,11 @@
-import { Alert } from 'react-bootstrap'
+import { Alert, Image } from 'react-bootstrap'
+import { vegefruit } from '../../Models/viewmodels'
 
 const Description = () => {
   return (
     <Alert variant="success" style={{ marginBottom: 0 }}>
       <Alert.Heading>Todo List App</Alert.Heading>
-      Welcome to the ClearPoint frontend technical test. We like to keep things simple, yet clean so your task(s) are as
-      follows:
-      <br />
-      <br />
-      <ol className="list-left">
-        <li>Add the ability to add (POST) a Todo Item by calling the backend API</li>
-        <li>Display (GET) all the current Todo Items in the below grid and display them in any order you wish</li>
-        <li>
-          Bonus points for completing the 'Mark as completed' button code for allowing users to update and mark a
-          specific Todo Item as completed and for displaying any relevant validation errors/ messages from the API in
-          the UI
-        </li>
-        <li>Feel free to add unit tests and refactor the component(s) as best you see fit</li>
-      </ol>
+      <p>Todos on steroids</p>
     </Alert>
   )
 }

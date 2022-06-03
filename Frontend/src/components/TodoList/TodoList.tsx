@@ -1,4 +1,4 @@
-import { Button, Table } from 'react-bootstrap'
+import { Badge, Button, ListGroup, Table } from 'react-bootstrap'
 import TodoItem, { TodoItemType } from '../TodoItem/TodoItem'
 
 export type TodoListType = {
@@ -15,6 +15,22 @@ const TodoList = ({ items, handleMarkAsComplete }: TodoListType) => {
           Refresh
         </Button>
       </h1>
+
+      <ListGroup as="ul">
+        {items.map((item, index) => {
+          return (
+            <ListGroup.Item as="li" className="d-flex justify-content-between align-items-start">
+              <div className="ms-2 me-auto">
+                <div className="fw-bold">{item.id}</div>
+                {item.description}
+              </div>
+              <Badge bg={item.isCompleted ? 'success' : 'warning'} pill>
+                {item.isCompleted ? 'Completed' : 'In Progress'}
+              </Badge>
+            </ListGroup.Item>
+          )
+        })}
+      </ListGroup>
 
       <Table role="table" aria-label="todoList-table" striped bordered hover>
         <thead>
