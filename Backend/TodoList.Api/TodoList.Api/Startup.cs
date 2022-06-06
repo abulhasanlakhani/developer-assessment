@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +7,10 @@ using Microsoft.OpenApi.Models;
 using TodoList.Infrastructure.Data;
 using TodoList.Infrastructure.Repositories;
 using TodoList.Infrastructure.Repositories.Interfaces;
+using MediatR;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System;
 
 namespace TodoList.Api
 {
@@ -35,13 +38,17 @@ namespace TodoList.Api
             });
 
             services.AddControllers();
+            services.Configure<JsonSerializerOptions>(options =>
+                options.Converters.Add(new DateOnlyConverter()));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoList.Api", Version = "v1" });
             });
 
-            services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("TodoItemsDB"));
+            services.AddDbContext<TodoContext>();
             services.AddScoped<ITodoRepository, TodoRepository>();
+
+            services.AddMediatR(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,5 +76,26 @@ namespace TodoList.Api
                 endpoints.MapControllers();
             });
         }
+    }
+
+    public class DateOnlyConverter : JsonConverter<DateOnly>
+    {
+        private readonly string serializationFormat;
+        public DateOnlyConverter() : this(null)
+        {
+        }
+
+        public DateOnlyConverter(string serializationFormat) => this.serializationFormat = serializationFormat ?? "yyyy-MM-dd";
+
+        public override DateOnly Read(ref Utf8JsonReader reader,
+                                Type typeToConvert, JsonSerializerOptions options)
+        {
+            var value = reader.GetString();
+            return DateOnly.Parse(value!);
+        }
+
+        public override void Write(Utf8JsonWriter writer, DateOnly value,
+                                            JsonSerializerOptions options)
+            => writer.WriteStringValue(value.ToString(serializationFormat));
     }
 }

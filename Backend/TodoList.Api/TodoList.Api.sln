@@ -7,13 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoList.Api", "TodoList.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoList.Api.UnitTests", "TodoList.Api.UnitTests\TodoList.Api.UnitTests.csproj", "{2BBBFEED-85B6-4361-85B2-F9E08C86C55B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoList.Infrastructure", "Core\TodoList.Infrastructure\TodoList.Infrastructure.csproj", "{B4A3EEE7-2E32-4187-9293-CB189C37C46B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoList.Infrastructure", "Core\TodoList.Infrastructure\TodoList.Infrastructure.csproj", "{B4A3EEE7-2E32-4187-9293-CB189C37C46B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{4A307FFD-A2D1-49BA-B16F-8C45D2A77BFD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{9C578494-CA68-4954-8E21-16F618A895A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{35EE51BC-DD5A-4778-BC62-2DE289942ECF}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D696594C-0ED1-45ED-B76B-E36B9DF230C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{B4A3EEE7-2E32-4187-9293-CB189C37C46B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4A3EEE7-2E32-4187-9293-CB189C37C46B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4A3EEE7-2E32-4187-9293-CB189C37C46B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D696594C-0ED1-45ED-B76B-E36B9DF230C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D696594C-0ED1-45ED-B76B-E36B9DF230C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D696594C-0ED1-45ED-B76B-E36B9DF230C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D696594C-0ED1-45ED-B76B-E36B9DF230C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

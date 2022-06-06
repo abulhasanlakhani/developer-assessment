@@ -21,7 +21,7 @@ public class TodoRepository : ITodoRepository
     {
         var todos = await _context.TodoItems.ToListAsync();
 
-        _logger?.LogInformation($"{todos.Count} todos retrieved from the database");
+        _logger.LogInformation("{count} todos retrieved from the database", todos.Count);
 
         return todos;
     }
@@ -32,11 +32,11 @@ public class TodoRepository : ITodoRepository
 
         if (todo == null)
         {
-            _logger?.LogError($"todo with ID: {id} could not be found in the database");
+            _logger.LogError("todo with ID: {id} could not be found in the database", id);
             return null;
         }
 
-        _logger?.LogInformation($"{todo.Id} todos retrieved from the database");
+        _logger.LogInformation("{id} todos retrieved from the database", id);
 
         return todo;
     }
@@ -47,20 +47,20 @@ public class TodoRepository : ITodoRepository
 
         try
         {
-            await _context.SaveChangesAsync();
+            var updateResult = await _context.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
             if (!TodoItemIdExists(id))
             {
-                _logger?.LogError($"todo with ID: {id} could not be found in the database");
+                _logger.LogError("todo with ID: {id} could not be found in the database", id);
                 return false;
             }
 
             throw;
         }
 
-        _logger?.LogInformation($"Todo with ID {todoItemToEdit.Id} has been updated in the database!");
+        _logger.LogInformation("Todo with ID {id} has been updated in the database!", todoItemToEdit.Id);
         return true;
     }
 
@@ -68,7 +68,7 @@ public class TodoRepository : ITodoRepository
     {
         if (string.IsNullOrEmpty(newTodoItem.Description))
         {
-            throw new ArgumentNullException(nameof(TodoItem));
+            throw new ArgumentNullException(nameof(newTodoItem));
         }
 
         newTodoItem.Id = Guid.NewGuid();
@@ -77,7 +77,7 @@ public class TodoRepository : ITodoRepository
         _context.TodoItems.Add(newTodoItem);
         await _context.SaveChangesAsync();
 
-        _logger?.LogInformation($"Todo with ID {newTodoItem.Id} has been added to the database!");
+        _logger?.LogInformation("Todo with ID {id} has been added to the database!", newTodoItem.Id);
     }
 
     public bool TodoItemDescriptionExists(string description)

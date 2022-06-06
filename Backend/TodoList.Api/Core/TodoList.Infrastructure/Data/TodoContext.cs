@@ -5,19 +5,16 @@ namespace TodoList.Infrastructure.Data
 {
     public class TodoContext : DbContext
     {
-        public TodoContext(DbContextOptions<TodoContext> options)
-            : base(options)
-        {
-        }
+        //public TodoContext(DbContextOptions<TodoContext> options)
+        //    : base(options)
+        //{
+        //}
 
         public DbSet<TodoItem> TodoItems => Set<TodoItem>();
 
-        // Use Seed.TodoList or Seed.BlankTodoList or comment out OnModelCreating method
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            modelBuilder.Entity<TodoItem>().HasData(Seed.TodoList);
-
-            base.OnModelCreating(modelBuilder);
+            optionsBuilder.UseInMemoryDatabase("TodoItemsDB");
         }
     }
 }
