@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
+using TodoList.Api.Commands;
 using TodoList.Api.Controllers;
 using TodoList.Infrastructure.Data.Models;
 using TodoList.Infrastructure.Repositories.Interfaces;
@@ -34,7 +35,7 @@ namespace TodoList.Api.UnitTests.Api
         [Fact]
         public async Task GetTodo_ReturnsNotFoundResult_WhenTodoIsNotFound()
         {
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
+            var todoController = new TodoItemsController(_mediator);
 
             var todoId = Guid.NewGuid();
             
@@ -51,7 +52,7 @@ namespace TodoList.Api.UnitTests.Api
         [Fact]
         public async Task GetTodo_ReturnsOkResult_WhenTodoIsFound()
         {
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
+            var todoController = new TodoItemsController(_mediator);
 
             var todo = new TodoItem(Guid.NewGuid(), "test todo", false, null, -1);
 
@@ -69,7 +70,7 @@ namespace TodoList.Api.UnitTests.Api
         public async Task GetAllTodos_ReturnsOkResult_WithAllTodoRecords()
         {
             // Arrange
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
+            var todoController = new TodoItemsController(_mediator);
 
             var todoList = new List<TodoItem>
             {
@@ -97,15 +98,16 @@ namespace TodoList.Api.UnitTests.Api
         public async Task Create_ReturnsNewlyCreatedTodoItem()
         {
             // Arrange
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
+            var todoController = new TodoItemsController(_mediator);
 
-            var newTodo = new TodoItem(Guid.NewGuid(), "test todo 1", false, null, -1);
+            var createTodoCommand = new CreateTodoCommand("Test todo 1", false, null, -1);
+            var newTodo = new TodoItem(Guid.NewGuid(), createTodoCommand.Description, createTodoCommand.IsCompleted, createTodoCommand.ExpireDate, createTodoCommand.OwnerId);
 
             _todoRepository.AddTodo(newTodo)
                 .Returns(Task.CompletedTask);
 
             // Act
-            var result = await todoController.PostTodoItem(newTodo);
+            var result = await todoController.PostTodoItem(createTodoCommand);
 
             // Assert
 
@@ -119,14 +121,15 @@ namespace TodoList.Api.UnitTests.Api
         public async Task Create_ReturnsBadRequestIfDescriptionIsEmpty()
         {
             // Arrange
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
+            var todoController = new TodoItemsController(_mediator);
 
-            var newTodo = new TodoItem(Guid.NewGuid(), "", false, null, -1);
+            var createTodoCommand = new CreateTodoCommand("", false, null, -1);
+            var newTodo = new TodoItem(Guid.NewGuid(), createTodoCommand.Description, createTodoCommand.IsCompleted, createTodoCommand.ExpireDate, createTodoCommand.OwnerId);
 
             _todoRepository.AddTodo(newTodo).Returns(Task.CompletedTask);
 
             // Act
-            var result = await todoController.PostTodoItem(newTodo);
+            var result = await todoController.PostTodoItem(createTodoCommand);
 
             // Assert
 
@@ -139,7 +142,7 @@ namespace TodoList.Api.UnitTests.Api
         public async Task Create_ReturnsBadRequestIfTodoItemIsNull()
         {
             // Arrange
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
+            var todoController = new TodoItemsController(_mediator);
 
             var newTodo = new TodoItem(Guid.NewGuid(), "", false, null, -1);
 
@@ -159,17 +162,18 @@ namespace TodoList.Api.UnitTests.Api
         public async Task Create_ReturnsBadRequestIfDescriptionAlreadyExists()
         {
             // Arrange
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
+            var todoController = new TodoItemsController(_mediator);
 
-            var newTodo = new TodoItem(Guid.NewGuid(), "Item already exists", false, null, -1);
-
+            var createTodoCommand = new CreateTodoCommand("Item already exists", false, null, -1);
+            var newTodo = new TodoItem(Guid.NewGuid(), createTodoCommand.Description, createTodoCommand.IsCompleted, createTodoCommand.ExpireDate, createTodoCommand.OwnerId);
+            
             _todoRepository.AddTodo(newTodo)
                 .Returns(Task.CompletedTask);
             
             _todoRepository.TodoItemDescriptionExists(Arg.Any<string>()).Returns(true);
 
             // Act
-            var result = await todoController.PostTodoItem(newTodo);
+            var result = await todoController.PostTodoItem(createTodoCommand);
 
             // Assert
 
@@ -182,14 +186,15 @@ namespace TodoList.Api.UnitTests.Api
         public async Task Edit_ReturnsBadRequestIfIdDoesntMatchWithTodoId()
         {
             // Arrange
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
-            
-            var newTodo = new TodoItem(Guid.NewGuid(), "", false, null, -1);
+            var todoController = new TodoItemsController(_mediator);
+
+            var updateTodoCommand = new UpdateTodoCommand(Guid.NewGuid(), "", false, null, -1);
+            var newTodo = new TodoItem(updateTodoCommand.Id, updateTodoCommand.Description, updateTodoCommand.IsCompleted, updateTodoCommand.ExpireDate, updateTodoCommand.OwnerId);
 
             _todoRepository.EditTodo(Guid.NewGuid(), newTodo).Returns(true);
 
             // Act
-            var result = await todoController.PutTodoItem(Guid.NewGuid(), newTodo);
+            var result = await todoController.PutTodoItem(Guid.NewGuid(), updateTodoCommand);
 
             // Assert
 
@@ -201,14 +206,16 @@ namespace TodoList.Api.UnitTests.Api
         public async Task Edit_ReturnsTrueIfIdMatchesWithTodoId()
         {
             // Arrange
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
+            var todoController = new TodoItemsController(_mediator);
             var todoId = Guid.NewGuid();
-            var newTodo = new TodoItem(todoId, "", false, null, -1);
+
+            var updateTodoCommand = new UpdateTodoCommand(todoId, "", false, null, -1);
+            var newTodo = new TodoItem(updateTodoCommand.Id, updateTodoCommand.Description, updateTodoCommand.IsCompleted, updateTodoCommand.ExpireDate, updateTodoCommand.OwnerId);
 
             _todoRepository.EditTodo(todoId, newTodo).Returns(true);
 
             // Act
-            var result = await todoController.PutTodoItem(todoId, newTodo);
+            var result = await todoController.PutTodoItem(todoId, updateTodoCommand);
 
             // Assert
 
@@ -220,15 +227,17 @@ namespace TodoList.Api.UnitTests.Api
         public async void Edit_ReturnsFalseIfIdNotFound()
         {
             // Arrange
-            var todoController = new TodoItemsController(_todoRepository, _mediator);
+            var todoController = new TodoItemsController(_mediator);
             var todoId = Guid.NewGuid();
-            var newTodo = new TodoItem(todoId, "", false, null, -1);
+
+            var updateTodoCommand = new UpdateTodoCommand(todoId, "", false, null, -1);
+            var newTodo = new TodoItem(updateTodoCommand.Id, updateTodoCommand.Description, updateTodoCommand.IsCompleted, updateTodoCommand.ExpireDate, updateTodoCommand.OwnerId);
 
             // Here it will return false acting as the id of the todoitem couldn't be found
             _todoRepository.EditTodo(todoId, newTodo).Returns(false);
 
             // Act
-            var result = await todoController.PutTodoItem(todoId, newTodo);
+            var result = await todoController.PutTodoItem(todoId, updateTodoCommand);
 
             // Assert
 

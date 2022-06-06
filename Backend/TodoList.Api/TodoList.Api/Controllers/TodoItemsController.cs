@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using TodoList.Infrastructure.Data.Models;
-using TodoList.Infrastructure.Repositories.Interfaces;
 using MediatR;
 using TodoList.Api.Queries;
 using TodoList.Api.Commands;
@@ -16,12 +15,10 @@ namespace TodoList.Api.Controllers
     [ApiController]
     public class TodoItemsController : ControllerBase
     {
-        private readonly ITodoRepository _todoRepository;
         private readonly IMediator _mediator;
 
-        public TodoItemsController(ITodoRepository todoRepository, IMediator mediator)
+        public TodoItemsController(IMediator mediator)
         {
-            _todoRepository = todoRepository;
             _mediator = mediator;
         }
 
@@ -54,35 +51,36 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> PutTodoItem(Guid id, TodoItem todoItem)
+        public async Task<IActionResult> PutTodoItem(Guid id, UpdateTodoCommand updateTodoCommand)
         {
-            if (id != todoItem.Id)
+            if (id != updateTodoCommand.Id)
             {
                 return BadRequest();
             }
 
-            var result = await _todoRepository.EditTodo(id, todoItem);
+            var result = await _mediator.Send(updateTodoCommand);
             
             // If modification failed then we will get false as a result
-            return result ? NoContent() : NotFound();
+            return result != null ? NoContent() : NotFound();
         } 
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(TodoItem))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PostTodoItem(TodoItem todoItem)
+        public async Task<IActionResult> PostTodoItem(CreateTodoCommand createTodoCommand)
         {
-            if (string.IsNullOrEmpty(todoItem?.Description))
+            if (string.IsNullOrEmpty(createTodoCommand?.Description))
             {
                 return BadRequest("Description is required");
             }
 
-            if (_todoRepository.TodoItemDescriptionExists(todoItem.Description))
+            var itemExistsQuery = new ItemDescriptionExistsQuery(createTodoCommand.Description);
+            var itemExistsQueryResponse = await _mediator.Send(itemExistsQuery);
+
+            if (itemExistsQueryResponse)
             {
                 return BadRequest("Description already exists");
             }
-
-            var createTodoCommand = new CreateTodoCommand(todoItem.Description, todoItem.IsCompleted, todoItem.ExpireDate, todoItem.OwnerId);
 
             var result = await _mediator.Send(createTodoCommand);
              
