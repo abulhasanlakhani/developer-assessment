@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  todolist.api:
+    image: ${DOCKER_REGISTRY-}todolistapi
+    build:
+      context: .
+      dockerfile: TodoList.Api/Dockerfile

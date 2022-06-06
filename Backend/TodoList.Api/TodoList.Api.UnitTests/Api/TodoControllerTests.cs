@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NSubstitute;
@@ -11,17 +12,34 @@ using Xunit;
 
 namespace TodoList.Api.UnitTests.Api
 {
-    public class TodoControllerTests
+    public class TodoControllerTests : IDisposable
     {
-        [Fact]
-        public async void GetTodo_ReturnsNotFoundResult_WhenTodoIsNotFound()
+        private ITodoRepository _todoRepository;
+        private IMediator _mediator;
+        
+        public TodoControllerTests()
         {
             // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            _todoRepository = Substitute.For<ITodoRepository>();
+            _mediator = Substitute.For<IMediator>();
+        }
+
+        public void Dispose()
+        {
+            _todoRepository = null;
+            _mediator = null;
+            GC.SuppressFinalize(this);
+        }
+
+        [Fact]
+        public async Task GetTodo_ReturnsNotFoundResult_WhenTodoIsNotFound()
+        {
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
 
             var todoId = Guid.NewGuid();
-            todoRepository.GetTodoById(todoId).Returns(Task.FromResult<TodoItem>(null));
+            
+            _todoRepository.GetTodoById(todoId)
+                .Returns(Task.FromResult<TodoItem>(null));
 
             // Act
             var result = await todoController.GetTodoItem(todoId);
@@ -31,15 +49,14 @@ namespace TodoList.Api.UnitTests.Api
         }
 
         [Fact]
-        public async void GetTodo_ReturnsOkResult_WhenTodoIsFound()
+        public async Task GetTodo_ReturnsOkResult_WhenTodoIsFound()
         {
-            // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
 
-            var todo = new TodoItem(Guid.NewGuid(), "test todo", false);
+            var todo = new TodoItem(Guid.NewGuid(), "test todo", false, null, -1);
 
-            todoRepository.GetTodoById(todo.Id).Returns(Task.FromResult(todo));
+            _todoRepository.GetTodoById(todo.Id)
+                .Returns(Task.FromResult(todo));
 
             // Act
             var result = await todoController.GetTodoItem(todo.Id);
@@ -49,22 +66,22 @@ namespace TodoList.Api.UnitTests.Api
         }
 
         [Fact]
-        public async void GetAllTodos_ReturnsOkResult_WithAllTodoRecords()
+        public async Task GetAllTodos_ReturnsOkResult_WithAllTodoRecords()
         {
             // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
 
             var todoList = new List<TodoItem>
             {
-                new(Guid.NewGuid(), "test todo 1", false),
-                new(Guid.NewGuid(), "test todo 2", false),
-                new(Guid.NewGuid(), "test todo 3", false),
-                new(Guid.NewGuid(), "test todo 4", false),
-                new(Guid.NewGuid(), "test todo 5", false)
+                new(Guid.NewGuid(), "test todo 1", false, null, -1),
+                new(Guid.NewGuid(), "test todo 2", false, null, -1),
+                new(Guid.NewGuid(), "test todo 3", false, null, -1),
+                new(Guid.NewGuid(), "test todo 4", false, null, -1),
+                new(Guid.NewGuid(), "test todo 5", false, null, -1)
             };
 
-            todoRepository.GetTodos().Returns(Task.FromResult(todoList));
+            _todoRepository.GetTodos()
+                .Returns(Task.FromResult(todoList));
 
             // Act
             var result = await todoController.GetTodoItems();
@@ -77,15 +94,15 @@ namespace TodoList.Api.UnitTests.Api
         }
 
         [Fact]
-        public async void Create_ReturnsNewlyCreatedTodoItem()
+        public async Task Create_ReturnsNewlyCreatedTodoItem()
         {
             // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
 
-            var newTodo = new TodoItem(Guid.NewGuid(), "test todo 1", false);
+            var newTodo = new TodoItem(Guid.NewGuid(), "test todo 1", false, null, -1);
 
-            todoRepository.AddTodo(newTodo).Returns(Task.CompletedTask);
+            _todoRepository.AddTodo(newTodo)
+                .Returns(Task.CompletedTask);
 
             // Act
             var result = await todoController.PostTodoItem(newTodo);
@@ -99,15 +116,14 @@ namespace TodoList.Api.UnitTests.Api
         }
 
         [Fact]
-        public async void Create_ReturnsBadRequestIfDescriptionIsEmpty()
+        public async Task Create_ReturnsBadRequestIfDescriptionIsEmpty()
         {
             // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
 
-            var newTodo = new TodoItem(Guid.NewGuid(), "", false);
+            var newTodo = new TodoItem(Guid.NewGuid(), "", false, null, -1);
 
-            todoRepository.AddTodo(newTodo).Returns(Task.CompletedTask);
+            _todoRepository.AddTodo(newTodo).Returns(Task.CompletedTask);
 
             // Act
             var result = await todoController.PostTodoItem(newTodo);
@@ -120,15 +136,14 @@ namespace TodoList.Api.UnitTests.Api
         }
 
         [Fact]
-        public async void Create_ReturnsBadRequestIfTodoItemIsNull()
+        public async Task Create_ReturnsBadRequestIfTodoItemIsNull()
         {
             // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
 
-            var newTodo = new TodoItem(Guid.NewGuid(), "", false);
+            var newTodo = new TodoItem(Guid.NewGuid(), "", false, null, -1);
 
-            todoRepository.AddTodo(newTodo).Returns(Task.CompletedTask);
+            _todoRepository.AddTodo(newTodo).Returns(Task.CompletedTask);
 
             // Act
             var result = await todoController.PostTodoItem(null);
@@ -141,16 +156,17 @@ namespace TodoList.Api.UnitTests.Api
         }
 
         [Fact]
-        public async void Create_ReturnsBadRequestIfDescriptionAlreadyExists()
+        public async Task Create_ReturnsBadRequestIfDescriptionAlreadyExists()
         {
             // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
 
-            var newTodo = new TodoItem(Guid.NewGuid(), "Item already exists", false);
+            var newTodo = new TodoItem(Guid.NewGuid(), "Item already exists", false, null, -1);
 
-            todoRepository.AddTodo(newTodo).Returns(Task.CompletedTask);
-            todoRepository.TodoItemDescriptionExists(Arg.Any<string>()).Returns(true);
+            _todoRepository.AddTodo(newTodo)
+                .Returns(Task.CompletedTask);
+            
+            _todoRepository.TodoItemDescriptionExists(Arg.Any<string>()).Returns(true);
 
             // Act
             var result = await todoController.PostTodoItem(newTodo);
@@ -163,15 +179,14 @@ namespace TodoList.Api.UnitTests.Api
         }
 
         [Fact]
-        public async void Edit_ReturnsBadRequestIfIdDoesntMatchWithTodoId()
+        public async Task Edit_ReturnsBadRequestIfIdDoesntMatchWithTodoId()
         {
             // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
             
-            var newTodo = new TodoItem(Guid.NewGuid(), "", false);
+            var newTodo = new TodoItem(Guid.NewGuid(), "", false, null, -1);
 
-            todoRepository.EditTodo(Guid.NewGuid(), newTodo).Returns(true);
+            _todoRepository.EditTodo(Guid.NewGuid(), newTodo).Returns(true);
 
             // Act
             var result = await todoController.PutTodoItem(Guid.NewGuid(), newTodo);
@@ -183,15 +198,14 @@ namespace TodoList.Api.UnitTests.Api
         }
 
         [Fact]
-        public async void Edit_ReturnsTrueIfIdMatchesWithTodoId()
+        public async Task Edit_ReturnsTrueIfIdMatchesWithTodoId()
         {
             // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
             var todoId = Guid.NewGuid();
-            var newTodo = new TodoItem(todoId, "", false);
+            var newTodo = new TodoItem(todoId, "", false, null, -1);
 
-            todoRepository.EditTodo(todoId, newTodo).Returns(true);
+            _todoRepository.EditTodo(todoId, newTodo).Returns(true);
 
             // Act
             var result = await todoController.PutTodoItem(todoId, newTodo);
@@ -206,13 +220,12 @@ namespace TodoList.Api.UnitTests.Api
         public async void Edit_ReturnsFalseIfIdNotFound()
         {
             // Arrange
-            var todoRepository = Substitute.For<ITodoRepository>();
-            var todoController = new TodoItemsController(todoRepository);
+            var todoController = new TodoItemsController(_todoRepository, _mediator);
             var todoId = Guid.NewGuid();
-            var newTodo = new TodoItem(todoId, "", false);
+            var newTodo = new TodoItem(todoId, "", false, null, -1);
 
             // Here it will return false acting as the id of the todoitem couldn't be found
-            todoRepository.EditTodo(todoId, newTodo).Returns(false);
+            _todoRepository.EditTodo(todoId, newTodo).Returns(false);
 
             // Act
             var result = await todoController.PutTodoItem(todoId, newTodo);

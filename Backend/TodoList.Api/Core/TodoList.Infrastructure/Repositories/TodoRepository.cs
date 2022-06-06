@@ -32,11 +32,11 @@ public class TodoRepository : ITodoRepository
 
         if (todo == null)
         {
-            _logger?.LogError($"todo with ID: {id} could not be found in the database");
+            _logger?.LogError("todo with ID: {id} could not be found in the database", id);
             return null;
         }
 
-        _logger?.LogInformation($"{todo.Id} todos retrieved from the database");
+        _logger?.LogInformation($"{id} todos retrieved from the database");
 
         return todo;
     }
@@ -68,7 +68,7 @@ public class TodoRepository : ITodoRepository
     {
         if (string.IsNullOrEmpty(newTodoItem.Description))
         {
-            throw new ArgumentNullException(nameof(TodoItem));
+            throw new ArgumentNullException(nameof(newTodoItem));
         }
 
         newTodoItem.Id = Guid.NewGuid();

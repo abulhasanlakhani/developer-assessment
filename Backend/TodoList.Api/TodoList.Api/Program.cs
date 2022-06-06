@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using TodoList.Infrastructure.Data;
 
 namespace TodoList.Api
 {
@@ -7,6 +8,13 @@ namespace TodoList.Api
     {
         public static void Main(string[] args)
         {
+            using TodoContext context = new();
+            // Temporary way of creating / testing database
+            context.Database.EnsureCreated();
+
+            context.TodoItems.AddRange(Seed.TodoList);
+            context.SaveChanges();
+
             CreateHostBuilder(args).Build().Run();
         }
 

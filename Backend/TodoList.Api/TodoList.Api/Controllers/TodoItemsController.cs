@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using TodoList.Infrastructure.Data.Models;
 using TodoList.Infrastructure.Repositories.Interfaces;
+using MediatR;
+using TodoList.Api.Queries;
+using TodoList.Api.Commands;
 
 namespace TodoList.Api.Controllers
 {
@@ -14,17 +17,20 @@ namespace TodoList.Api.Controllers
     public class TodoItemsController : ControllerBase
     {
         private readonly ITodoRepository _todoRepository;
+        private readonly IMediator _mediator;
 
-        public TodoItemsController(ITodoRepository todoRepository)
+        public TodoItemsController(ITodoRepository todoRepository, IMediator mediator)
         {
             _todoRepository = todoRepository;
+            _mediator = mediator;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TodoItem>))]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
         {
-            var results = await _todoRepository.GetTodos();
+            var query = new GetAllTodosQuery();
+            var results = await _mediator.Send(query);
             return Ok(results);
         }
 
@@ -33,7 +39,8 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TodoItem>> GetTodoItem(Guid id)
         {
-            var result = await _todoRepository.GetTodoById(id);
+            var query = new GetTodoQuery(id);
+            var result = await _mediator.Send(query);
 
             if (result == null)
             {
@@ -75,9 +82,11 @@ namespace TodoList.Api.Controllers
                 return BadRequest("Description already exists");
             }
 
-            await _todoRepository.AddTodo(todoItem);
+            var createTodoCommand = new CreateTodoCommand(todoItem.Description, todoItem.IsCompleted, todoItem.ExpireDate, todoItem.OwnerId);
+
+            var result = await _mediator.Send(createTodoCommand);
              
-            return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItem);
+            return CreatedAtAction(nameof(GetTodoItem), new { id = result.Id }, result);
         }
     }
 }
